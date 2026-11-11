@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Coach Français 法语教练</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<script>
+// Thème mémorisé, appliqué avant le rendu (pas de flash).
+(function(){try{var t=localStorage.getItem("coachfr-theme");if(t!=="dark"&&t!=="light")t=(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}})();
+</script>
+<style>
+/* ============================================================
+   Coach Français 法语教练 — même charte que Coach Mandarin :
+   « encre & cinabre », un seul accent, filets fins, deux thèmes.
+   ============================================================ */
+:root{
+  color-scheme:light;
+  --paper:#ffffff; --paper-2:#f8f8f6; --paper-3:#f0f0ed;
+  --ink:#17191e; --ink-2:#4d525c; --ink-3:#656c79;
+  --line:#e6e6e2; --line-2:#d2d2cd;
+  --accent:#c0392f; --accent-2:#9a2b23; --accent-soft:#fbf0ee;
+  --jade:#15795c; --jade-soft:#eff6f3;
+  --err:#b3261e; --err-soft:#fdf1f0;
+  --amber:#8f6410; --amber-soft:#fbf5e8;
+  --on-solid:#ffffff;
+  --shadow:0 1px 2px rgba(20,22,28,.05); --shadow-2:0 8px 28px rgba(20,22,28,.12);
+  --r:8px; --r-lg:12px;
+  --font:"Inter","Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+  --font-hz:"PingFang SC","Microsoft YaHei","Noto Sans SC","Source Han Sans SC",sans-serif;
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#1b1e24; --paper-2:#131519; --paper-3:#242830;
+  --ink:#e9e9e6; --ink-2:#a9b0bc; --ink-3:#7b828f;
+  --line:#2a2e36; --line-2:#3b414b;
+  --accent:#e2594a; --accent-2:#f0776a; --accent-soft:#2b1c1a;
+  --jade:#3cb98d; --jade-soft:#152621;
+  --err:#e5645a; --err-soft:#2a1a19;
+  --amber:#d7a743; --amber-soft:#29220f;
+  --on-solid:#12141a;
+  --shadow:0 1px 2px rgba(0,0,0,.45); --shadow-2:0 10px 32px rgba(0,0,0,.55);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper-2);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5}
+button{font:inherit;color:inherit;cursor:pointer}
+svg{width:1.15em;height:1.15em;flex:none}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px 80px}
+
+/* ---------- barre du haut ---------- */
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top-in{max-width:880px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.brand{font-weight:700;letter-spacing:.01em;display:flex;align-items:baseline;gap:8px;cursor:pointer;background:none;border:0;padding:0}
+.brand b{color:var(--accent)}
+.brand small{color:var(--ink-3);font-weight:500;font-size:.82rem}
+.top .sp{flex:1}
+.chip{border:1px solid var(--line-2);background:var(--paper);border-radius:999px;padding:5px 12px;font-size:.84rem;display:inline-flex;align-items:center;gap:6px;color:var(--ink-2)}
+.chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.chip:hover{border-color:var(--ink-3)}
+
+/* ---------- typographie bilingue ---------- */
+.zh{font-family:var(--font-hz)}
+.sub{color:var(--ink-3);font-size:.84rem}
+.py{display:none;color:var(--ink-3);font-size:.82rem;font-style:italic}
+body.py-on .py{display:block}
+h1{font-size:1.7rem;line-height:1.2;margin:26px 0 4px;text-wrap:balance}
+h2{font-size:1.08rem;margin:30px 0 10px;display:flex;align-items:baseline;gap:10px;padding-bottom:7px;border-bottom:1px solid var(--line-2)}
+h2 .zh{color:var(--accent);font-weight:700;font-size:1.12rem}
+h2 .sub{font-weight:500}
+
+/* ---------- accueil ---------- */
+.lead{color:var(--ink-2);margin:0 0 6px;max-width:62ch}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 6px}
+.step{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.step .n{color:var(--accent);font-weight:700;font-size:.8rem;letter-spacing:.06em}
+.step .t{font-weight:600;margin-top:2px}
+.cards{display:grid;gap:12px}
+.card{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;text-align:left;width:100%;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}
+.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card .num{font-size:1.9rem;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;text-align:center;line-height:1}
+.card .num small{display:block;font-size:.68rem;color:var(--ink-3);font-weight:600;letter-spacing:.08em;margin-top:4px}
+.card .t1{font-size:1.2rem;font-weight:700}
+.card .t2{color:var(--ink-2);font-size:.92rem}
+.card .t3{color:var(--ink-3);font-size:.86rem;margin-top:4px}
+.dots{display:flex;gap:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--line-2)}
+.dot.on{background:var(--jade)}
+
+/* ---------- page d'un cours ---------- */
+.back{background:none;border:0;padding:6px 0;margin-top:14px;color:var(--ink-3);display:inline-flex;align-items:center;gap:6px;font-size:.9rem}
+.back:hover{color:var(--accent)}
+.kicker{color:var(--accent);font-weight:700;font-size:.82rem;letter-spacing:.08em;margin-top:6px}
+.modes{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:18px 0 4px}
+.mode{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:12px 10px;text-align:center;position:relative;transition:border-color .15s}
+.mode:hover{border-color:var(--accent)}
+.mode .ico{color:var(--accent);font-size:1.35rem;display:flex;justify-content:center}
+.mode .t1{font-weight:700;margin-top:4px}
+.mode .t2{color:var(--ink-3);font-size:.78rem}
+.mode.fait::after{content:"";position:absolute;top:8px;right:8px;width:9px;height:9px;border-radius:50%;background:var(--jade)}
+.box{background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--jade);border-radius:var(--r);padding:12px 16px}
+.box.acc{border-left-color:var(--accent)}
+.box ul,.box ol{margin:0;padding-left:1.2em}
+.box li{margin:6px 0}
+.box li .sub{display:block}
+
+.list{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.item{display:grid;grid-template-columns:auto 1fr 1fr;gap:12px;align-items:center;padding:9px 14px;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item.joue{background:var(--accent-soft)}
+.item .fr{font-weight:600;font-size:1.02rem}
+.item .who{color:var(--accent);font-weight:700;font-size:.8rem;display:block}
+.item.eleve{background:color-mix(in srgb,var(--accent-soft) 55%,transparent)}
+.btns{display:flex;gap:6px}
+.ic{width:36px;height:36px;border-radius:50%;border:1px solid var(--line-2);background:var(--paper);display:inline-flex;align-items:center;justify-content:center;color:var(--accent);font-size:.74rem;font-weight:700}
+.ic:hover{border-color:var(--accent);background:var(--accent-soft)}
+.ic.lent{color:var(--ink-2)}
+.vocab{display:grid;grid-template-columns:1fr 1fr}
+.vocab .item{grid-template-columns:auto 1fr 1fr}
+.vocab .item:nth-child(2){border-top:0}
+.vocab .item:nth-child(odd){border-right:1px solid var(--line)}
+
+.notion{background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--r);padding:12px 16px;margin-bottom:10px}
+.notion h3{margin:0 0 4px;font-size:1rem;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.notion h3 .zh{color:var(--accent)}
+.notion p{margin:0}
+.notion table{border-collapse:collapse;margin-top:10px;width:100%;font-size:.95rem}
+.notion th{text-align:left;font-weight:500;color:var(--ink-3);font-size:.8rem;border-bottom:1px solid var(--line-2);padding:4px 10px 4px 0}
+.notion td{padding:5px 10px 5px 0;border-bottom:1px solid var(--line)}
+.notion td:first-child{font-weight:600}
+.son{display:grid;grid-template-columns:120px 1fr;gap:14px;padding:12px 14px;border-top:1px solid var(--line);align-items:start}
+.son:first-child{border-top:0}
+.son .s{color:var(--accent);font-weight:700;font-size:1.1rem}
+.mots{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mot{border:1px solid var(--line-2);background:var(--paper);border-radius:999px;padding:4px 12px;font-weight:600;display:inline-flex;gap:6px;align-items:center}
+.mot svg{color:var(--accent)}
+.mot:hover{border-color:var(--accent)}
+
+/* ---------- exercices ---------- */
+.ex{max-width:640px;margin:0 auto}
+.bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin:16px 0 6px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.meta{display:flex;justify-content:space-between;color:var(--ink-3);font-size:.84rem}
+.stage{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:26px 22px;margin-top:14px;text-align:center}
+.stage.ok{border-left:4px solid var(--jade)}
+.stage.ko{border-left:4px solid var(--err)}
+.stage.mid{border-left:4px solid var(--amber)}
+.consigne{color:var(--ink-3);font-size:.9rem;margin-bottom:14px}
+.big-fr{font-size:1.75rem;font-weight:700;line-height:1.25;text-wrap:balance}
+.big-zh{font-size:1.35rem;font-family:var(--font-hz);margin-top:8px;color:var(--ink-2)}
+.big-zh.prompt{font-size:1.6rem;color:var(--ink);font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:18px}
+.btn{border:1px solid var(--line-2);background:var(--paper);border-radius:var(--r);padding:10px 16px;display:inline-flex;align-items:center;gap:8px;font-weight:600;min-height:44px}
+.btn small{font-weight:500;color:var(--ink-3)}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-solid)}
+.btn.pri small{color:var(--on-solid);opacity:.85}
+.btn.pri:hover{background:var(--accent-2)}
+.btn.rec.on{background:var(--err);border-color:var(--err);color:var(--on-solid);animation:pulse 1.2s infinite}
+.btn[disabled]{opacity:.45;cursor:default}
+@keyframes pulse{50%{opacity:.7}}
+.micro{width:84px;height:84px;border-radius:50%;border:2px solid var(--accent);background:var(--accent-soft);color:var(--accent);font-size:1.7rem;display:inline-flex;align-items:center;justify-content:center;margin-top:18px}
+.micro.on{background:var(--err);border-color:var(--err);color:var(--on-solid);animation:pulse 1.2s infinite}
+.opts{display:grid;gap:10px;margin-top:20px;text-align:left}
+.opt{border:1px solid var(--line-2);background:var(--paper);border-radius:var(--r);padding:12px 16px;font-family:var(--font-hz);font-size:1.12rem;text-align:left}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.juste{border-color:var(--jade);border-left:4px solid var(--jade);background:var(--jade-soft)}
+.opt.faux{border-color:var(--err);border-left:4px solid var(--err);background:var(--err-soft)}
+.zone{min-height:58px;border:1px dashed var(--line-2);border-radius:var(--r);padding:8px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin-top:16px}
+.banque{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px;min-height:46px}
+.tuile{border:1px solid var(--line-2);background:var(--paper);border-radius:var(--r);padding:8px 14px;font-weight:600;font-size:1.08rem;box-shadow:var(--shadow)}
+.tuile:hover{border-color:var(--accent)}
+.note{margin-top:14px;font-size:.95rem}
+.note.ok{color:var(--jade)} .note.ko{color:var(--err)} .note.mid{color:var(--amber)}
+.entendu{margin-top:10px;color:var(--ink-2);font-size:.95rem}
+audio.moi{margin-top:14px;width:100%;max-width:340px}
+
+/* dialogue */
+.roles{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:16px 0}
+.fil{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.bulle{max-width:84%;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px 14px;align-self:flex-start;text-align:left}
+.bulle.moi{align-self:flex-end;border-color:var(--accent);background:var(--accent-soft)}
+.bulle.joue{box-shadow:0 0 0 2px var(--accent)}
+.bulle .who{color:var(--accent);font-weight:700;font-size:.78rem}
+.bulle .fr{font-weight:600;font-size:1.08rem}
+.bulle .cache{color:var(--ink-3);font-style:italic}
+.tour{position:sticky;bottom:12px;background:var(--paper);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:12px;margin-top:16px;text-align:center}
+.tour .row{margin-top:8px}
+
+.bilan .score{font-size:3rem;font-weight:700;color:var(--accent);line-height:1}
+.rappel{margin-top:18px;text-align:left}
+
+@media (max-width:640px){
+  .modes{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:1fr}
+  .vocab{grid-template-columns:1fr}
+  .vocab .item:nth-child(2){border-top:1px solid var(--line)}
+  .vocab .item:nth-child(odd){border-right:0}
+  .item,.vocab .item{grid-template-columns:auto 1fr;row-gap:2px}
+  .item .tz{grid-column:2}
+  .card{grid-template-columns:48px 1fr}
+  .card .dots{grid-column:2}
+  .son{grid-template-columns:1fr;gap:4px}
+  .big-fr{font-size:1.45rem}
+  h1{font-size:1.4rem}
+  .brand small{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="top"><div class="top-in">
+  <button class="brand" id="brand"><span><b>Coach</b> Français</span><small class="zh">法语教练</small></button>
+  <span class="sp"></span>
+  <button class="chip" id="btn-py" aria-pressed="false" title="Afficher le pinyin (aide pour le professeur)">拼音</button>
+  <button class="chip" id="btn-theme" title="Thème clair / sombre"></button>
+</div></div>
+<div class="wrap" id="app"></div>
+
+<script src="donnees.js"></script>
+<script>
+"use strict";
+// ============================================================
+// ICÔNES (SVG inline, couleur héritée du thème)
+// ============================================================
+const SVG = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  speaker: SVG('<path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.4 8.6a4.8 4.8 0 0 1 0 6.8"/><path d="M18.4 5.6a9 9 0 0 1 0 12.8"/>'),
+  mic: SVG('<rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5v4"/>'),
+  stop: SVG('<rect x="6.5" y="6.5" width="11" height="11" rx="1.5"/>'),
+  ear: SVG('<path d="M6.5 9.5a5.5 5.5 0 1 1 11 0c0 3-2.6 3.6-3.2 6-.5 2-1.4 4-3.6 4-1.7 0-2.7-1.1-2.7-2.5"/><path d="M9.5 9.5a2.5 2.5 0 1 1 5 0"/>'),
+  tiles: SVG('<rect x="3" y="8" width="5.5" height="8" rx="1.3"/><rect x="9.3" y="8" width="5.5" height="8" rx="1.3"/><rect x="15.6" y="8" width="5.5" height="8" rx="1.3"/>'),
+  chat: SVG('<path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3.5V15H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M19 9.5h1a2 2 0 0 1 2 2V16a2 2 0 0 1-2 2v2.5L17.5 18"/>'),
+  repeat: SVG('<path d="M4 11V9a3 3 0 0 1 3-3h11"/><path d="m15 3 3 3-3 3"/><path d="M20 13v2a3 3 0 0 1-3 3H6"/><path d="m9 21-3-3 3-3"/>'),
+  arrowLeft: SVG('<path d="M19 12H5.5"/><path d="m11 6-5.5 6L11 18"/>'),
+  arrowRight: SVG('<path d="M5 12h13.5"/><path d="m13 6 5.5 6L13 18"/>'),
+  check: SVG('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),
+  share: SVG('<path d="M12 15V3.5"/><path d="m7.5 8 4.5-4.5L16.5 8"/><path d="M5 13v6a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19v-6"/>'),
+  sun: SVG('<circle cx="12" cy="12" r="3.8"/><path d="M12 2.2v2.2M12 19.6v2.2M4.4 4.4l1.6 1.6M18 18l1.6 1.6M2.2 12h2.2M19.6 12h2.2M4.4 19.6 6 18M18 6l1.6-1.6"/>'),
+  moon: SVG('<path d="M20.2 14.6A8.6 8.6 0 0 1 9.4 3.8a7.6 7.6 0 1 0 10.8 10.8z"/>')
+};
+
+// ============================================================
+// OUTILS
+// ============================================================
+const $ = id => document.getElementById(id);
+const app = $("app");
+const h = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+// Typographie française : apostrophe courbe, espace insécable avant ? ! : ;
+const T = s => h(s).replace(/'/g, "’").replace(/ ([?!;:»])/g, " $1").replace(/« /g, "« ");
+const melange = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const COURS = window.COURS || [];
+const coursPar = id => COURS.find(c => c.id === id);
+
+// ---------- préférences & progression ----------
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+let progres = store.get("coachfr-progres", {});
+const MODES = [
+  { id: "repeter",  zh: "跟读", fr: "Répéter",  ico: "repeat", desc: "听 → 跟读 → 录音对比" },
+  { id: "ecouter",  zh: "听力", fr: "Écouter",  ico: "ear",    desc: "听法语，选中文意思" },
+  { id: "ordre",    zh: "排序", fr: "Ordre",    ico: "tiles",  desc: "把法语单词排成句子" },
+  { id: "parler",   zh: "口语", fr: "Parler",   ico: "mic",    desc: "看中文，说法语" },
+  { id: "dialogue", zh: "对话", fr: "Dialogue", ico: "chat",   desc: "角色扮演" }
+];
+function marque(cid, mode, score) {
+  const k = cid + ":" + mode, p = progres[k] || { n: 0, best: 0 };
+  p.n++; p.best = Math.max(p.best, score); p.last = Date.now();
+  progres[k] = p; store.set("coachfr-progres", progres);
+}
+
+// ---------- thème & pinyin ----------
+function majTheme() { $("btn-theme").innerHTML = document.documentElement.getAttribute("data-theme") === "dark" ? ICON.sun : ICON.moon; }
+$("btn-theme").onclick = () => {
+  const t = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", t); try { localStorage.setItem("coachfr-theme", t); } catch (e) {}
+  majTheme();
+};
+function majPy(on) { document.body.classList.toggle("py-on", on); $("btn-py").setAttribute("aria-pressed", on); }
+$("btn-py").onclick = () => { const on = !document.body.classList.contains("py-on"); store.set("coachfr-py", on); majPy(on); };
+majTheme(); majPy(store.get("coachfr-py", false));
+$("brand").onclick = () => { location.hash = ""; };
+
+// ============================================================
+// AUDIO : lecture des fichiers pré-générés (normal / lent)
+// ============================================================
+const lecteur = new Audio();
+let jeton = 0;
+function arreteAudio() { jeton++; lecteur.pause(); document.querySelectorAll(".joue").forEach(e => e.classList.remove("joue")); }
+function joue(it, lent, el) {
+  arreteAudio();
+  const moi = jeton;
+  if (el) el.classList.add("joue");
+  return new Promise(res => {
+    const fin = () => { if (el) el.classList.remove("joue"); res(moi === jeton); };
+    lecteur.onended = fin; lecteur.onerror = fin;
+    lecteur.src = lent ? it.l : it.a;
+    lecteur.play().catch(fin);
+  });
+}
+const pause = ms => new Promise(r => setTimeout(r, ms));
+
+// Registre des éléments affichés : un bouton ▶ ne porte qu'un numéro.
+let REG = [];
+const reg = it => REG.push(it) - 1;
+const boutons = it => { const k = reg(it); return `<span class="btns"><button class="ic" data-j="${k}" title="听 · Écouter" aria-label="Écouter">${ICON.speaker}</button><button class="ic lent" data-j="${k}" data-lent="1" title="慢速 · Lent" aria-label="Écouter lentement">慢</button></span>`; };
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-j]");
+  if (b) { const it = REG[+b.dataset.j]; if (it) joue(it, !!b.dataset.lent, b.closest(".item,.bulle,.mot")); }
+});
+
+// ============================================================
+// ENREGISTREMENT DE SA VOIX (pour comparer et partager)
+// ============================================================
+const enr = { rec: null, blob: null, url: null, actif: false };
+const peutEnregistrer = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+async function enrBascule(apres) {
+  if (enr.actif) { enr.rec.stop(); return; }
+  try {
+    const flux = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const morceaux = [];
+    enr.rec = new MediaRecorder(flux);
+    enr.rec.ondataavailable = e => morceaux.push(e.data);
+    enr.rec.onstop = () => {
+      flux.getTracks().forEach(t => t.stop());
+      enr.actif = false;
+      enr.blob = new Blob(morceaux, { type: enr.rec.mimeType || "audio/webm" });
+      if (enr.url) URL.revokeObjectURL(enr.url);
+      enr.url = URL.createObjectURL(enr.blob);
+      apres();
+    };
+    arreteAudio(); enr.rec.start(); enr.actif = true; apres();
+  } catch (e) { alert("无法使用麦克风，请在浏览器中允许麦克风权限。\nMicro indisponible : autorise le micro dans le navigateur."); }
+}
+function enrVide() { if (enr.actif) { try { enr.rec.onstop = null; enr.rec.stop(); } catch (e) {} } enr.actif = false; enr.blob = null; if (enr.url) URL.revokeObjectURL(enr.url); enr.url = null; }
+async function enrPartage() {
+  if (!enr.blob) return;
+  const ext = /mp4|aac|m4a/.test(enr.blob.type) ? "m4a" : (/ogg/.test(enr.blob.type) ? "ogg" : "webm");
+  const f = new File([enr.blob], "mon-francais." + ext, { type: enr.blob.type });
+  if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: "Mon français" }); } catch (e) {} }
+  else { const a = document.createElement("a"); a.href = enr.url; a.download = f.name; a.click(); }
+}
+
+// ============================================================
+// RECONNAISSANCE VOCALE (Chrome / Edge / Safari) — retour immédiat
+// ============================================================
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+function lev(a, b) {
+  const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
+  let prev = Array.from({ length: n + 1 }, (_, j) => j);
+  for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; }
+  return prev[n];
+}
+const ressemble = (dit, attendu) => { const a = norm(dit), b = norm(attendu); return 1 - lev(a, b) / Math.max(a.length, b.length, 1); };
+
+// ============================================================
+// ROUTAGE : #c01 (cours)  ·  #c01/repeter (exercice)
+// ============================================================
+function route() {
+  arreteAudio(); enrVide(); if (S && S.sr) { try { S.sr.abort(); } catch (e) {} } S = null; REG = [];
+  const [cid, mode] = location.hash.replace(/^#\/?/, "").split("/");
+  const c = coursPar(cid);
+  if (!c) return vueAccueil();
+  if (mode && MODES.some(m => m.id === mode)) return demarre(c, mode);
+  vueCours(c);
+}
+window.addEventListener("hashchange", route);
+
+// ============================================================
+// ACCUEIL
+// ============================================================
+function vueAccueil() {
+  window.scrollTo(0, 0);
+  app.innerHTML = `
+    <h1><span class="zh">法语口语课</span></h1>
+    <p class="lead"><span class="zh">每节课：先在这里预习，上课时一起练习，课后发语音给老师。</span><br><span class="sub">Avant le cours on prépare ici, pendant le cours on pratique ensemble, après le cours on envoie un vocal au professeur.</span></p>
+    <div class="steps">
+      <div class="step"><div class="n">1 · 课前 AVANT</div><div class="t zh">听音频，跟读</div><div class="sub">Écouter et répéter</div></div>
+      <div class="step"><div class="n">2 · 上课 PENDANT</div><div class="t zh">和老师对话</div><div class="sub">Parler avec le professeur</div></div>
+      <div class="step"><div class="n">3 · 课后 APRÈS</div><div class="t zh">用 WhatsApp 发语音</div><div class="sub">Envoyer un vocal WhatsApp</div></div>
+    </div>
+    <h2><span class="zh">课程</span><span class="sub">Les cours</span></h2>
+    <div class="cards">${COURS.map(c => `
+      <button class="card" data-go="${c.id}">
+        <div class="num">${c.numero}<small>COURS</small></div>
+        <div><div class="t1 zh">${h(c.titre.zh)}</div><div class="t2">${T(c.titre.fr)}</div><div class="t3 zh">${h(c.resume.zh)}</div></div>
+        <div class="dots" title="练习完成情况">${modesDe(c).map(m => `<span class="dot ${progres[c.id + ":" + m.id] ? "on" : ""}"></span>`).join("")}</div>
+      </button>`).join("")}
+    </div>`;
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) location.hash = b.dataset.go; });
+
+// ============================================================
+// PAGE D'UN COURS
+// ============================================================
+const phrasesDe = c => (c.groupes || []).flatMap(g => g.items);
+const modesDe = c => MODES.filter(m => m.id !== "dialogue" || c.dialogue);
+const ligneItem = (it, extra = "") => `<div class="item ${extra}">${boutons(it)}<div class="fr">${it._qui ? `<span class="who">${h(it._qui)}</span>` : ""}${T(it.fr)}</div><div class="tz"><div class="zh">${h(it.zh)}</div><div class="py">${h(it.py)}</div></div></div>`;
+const bi = d => `<span class="zh">${h(d.zh)}</span><span class="sub"> ${T(d.fr)}</span>`;
+
+function vueCours(c) {
+  window.scrollTo(0, 0);
+  let o = `<button class="back" data-go="">${ICON.arrowLeft}<span class="zh">所有课程</span> · Tous les cours</button>
+    <div class="kicker">第 ${c.numero} 课 · COURS ${c.numero}</div>
+    <h1><span class="zh">${h(c.titre.zh)}</span></h1>
+    <p class="lead">${T(c.titre.fr)}</p>
+    <div class="modes">${modesDe(c).map(m => `
+      <button class="mode ${progres[c.id + ":" + m.id] ? "fait" : ""}" data-go="${c.id}/${m.id}" title="${h(m.desc)}">
+        <div class="ico">${ICON[m.ico]}</div><div class="t1 zh">${m.zh}</div><div class="t2">${m.fr}</div>
+      </button>`).join("")}</div>`;
+
+  if (c.objectifs) o += `<h2><span class="zh">学习目标</span><span class="sub">Objectifs</span></h2><div class="box"><ul>${c.objectifs.map(x => `<li>${bi(x)}</li>`).join("")}</ul></div>`;
+
+  if (c.vocab) o += `<h2><span class="zh">词汇</span><span class="sub">Vocabulaire</span></h2><div class="list vocab">${c.vocab.map(it => ligneItem(it)).join("")}</div>`;
+
+  if (c.notions) o += `<h2><span class="zh">语法与句型</span><span class="sub">Structures</span></h2>` + c.notions.map((n, i) => `
+    <div class="notion"><h3><span class="zh">${i + 1}. ${h(n.titre.zh)}</span><span class="sub">${T(n.titre.fr)}</span></h3>
+      <p class="zh">${h(n.texte.zh)}</p><p class="sub">${T(n.texte.fr)}</p>
+      ${n.table ? `<table><tr>${n.table.entetes.map(e => `<th class="zh">${h(e)}</th>`).join("")}</tr>${n.table.lignes.map(l => `<tr>${l.map(x => `<td>${T(x)}</td>`).join("")}</tr>`).join("")}</table>` : ""}
+    </div>`).join("");
+
+  (c.groupes || []).forEach(g => { o += `<h2><span class="zh">${h(g.titre.zh)}</span><span class="sub">${T(g.titre.fr)}</span></h2><div class="list">${g.items.map(it => ligneItem(it)).join("")}</div>`; });
+
+  if (c.dialogue) {
+    const d = c.dialogue;
+    o += `<h2><span class="zh">对话：${h(d.titre.zh)}</span><span class="sub">Dialogue — ${T(d.titre.fr)}</span></h2>
+      <div class="list">${d.lignes.map(it => ligneItem(Object.assign({}, it, { _qui: d.roles[it.qui].nom }), it.qui === d.eleve ? "eleve" : "")).join("")}</div>
+      <div class="row" style="justify-content:flex-start"><button class="btn pri" data-go="${c.id}/dialogue">${ICON.chat}<span class="zh">角色扮演</span><small>Jouer le dialogue</small></button></div>`;
+  }
+
+  if (c.prononciation) o += `<h2><span class="zh">发音</span><span class="sub">Prononciation</span></h2><div class="list">${c.prononciation.map(p => `
+      <div class="son"><div class="s">${h(p.son)}</div><div><div class="zh">${h(p.conseil.zh)}</div><div class="sub">${T(p.conseil.fr)}</div>
+        <div class="mots">${p.mots.map(m => `<button class="mot" data-j="${reg(m)}">${ICON.speaker}${T(m.fr)}</button>`).join("")}</div></div></div>`).join("")}</div>`;
+
+  if (c.devoirs) o += `<h2><span class="zh">课后练习</span><span class="sub">Après le cours</span></h2><div class="box acc"><ol>${c.devoirs.map(x => `<li>${bi(x)}</li>`).join("")}</ol></div>`;
+  app.innerHTML = o;
+}
+
+// ============================================================
+// EXERCICES
+// ============================================================
+let S = null; // session en cours
+function demarre(c, mode) {
+  window.scrollTo(0, 0);
+  const m = MODES.find(x => x.id === mode);
+  S = { c, m, i: 0, ok: 0, etat: null };
+  if (mode === "dialogue") return c.dialogue ? dlgChoix() : (location.hash = c.id);
+  const ph = phrasesDe(c);
+  if (mode === "repeter") S.items = ph;
+  if (mode === "ecouter") S.items = melange(ph.concat(c.vocab || [])).slice(0, 12);
+  if (mode === "ordre") {
+    const vus = new Set();
+    const tout = ph.concat(c.dialogue ? c.dialogue.lignes : []).filter(it => { const k = it.fr; if (vus.has(k)) return false; vus.add(k); return tuiles(it).length >= 3; });
+    S.items = melange(tout).slice(0, 10);
+  }
+  if (mode === "parler") S.items = melange(ph).slice(0, 12);
+  if (!S.items.length) { location.hash = c.id; return; }
+  question(true);
+}
+function cadre(contenu, classe = "") {
+  const n = S.items.length;
+  return `<div class="ex">
+    <button class="back" data-go="${S.c.id}">${ICON.arrowLeft}<span class="zh">第 ${S.c.numero} 课</span> · ${T(S.c.titre.fr)}</button>
+    <div class="bar"><i style="width:${Math.round(100 * S.i / n)}%"></i></div>
+    <div class="meta"><span><span class="zh">${S.m.zh}</span> · ${S.m.fr}</span><span>${Math.min(S.i + 1, n)} / ${n}</span></div>
+    <div class="stage ${classe}" id="stage">${contenu}</div></div>`;
+}
+function suivant(juste) { if (juste) S.ok++; S.i++; enrVide(); if (S.i >= S.items.length) return bilan(); question(true); }
+function question(auto) {
+  REG = []; S.etat = null;
+  ({ repeter: qRepeter, ecouter: qEcouter, ordre: qOrdre, parler: qParler })[S.m.id](auto);
+}
+const btnSuite = (txtZh = "下一句", txtFr = "Suivant") => `<button class="btn pri" id="suite"><span class="zh">${txtZh}</span><small>${txtFr}</small>${ICON.arrowRight}</button>`;
+
+// ---------- 跟读 · Répéter ----------
+function qRepeter(auto) {
+  const it = S.items[S.i];
+  const dessine = () => {
+    app.innerHTML = cadre(`
+      <div class="consigne"><span class="zh">先听，再大声跟读。可以录音，和示范对比。</span><br>Écoute, répète à voix haute, puis compare ta voix au modèle.</div>
+      <div class="big-fr">${T(it.fr)}</div><div class="big-zh">${h(it.zh)}</div><div class="py">${h(it.py)}</div>
+      <div class="row">
+        <button class="btn" id="b-a">${ICON.speaker}<span class="zh">听</span><small>Écouter</small></button>
+        <button class="btn" id="b-l">${ICON.speaker}<span class="zh">慢速</span><small>Lent</small></button>
+        ${peutEnregistrer ? `<button class="btn rec ${enr.actif ? "on" : ""}" id="b-r">${enr.actif ? ICON.stop : ICON.mic}<span class="zh">${enr.actif ? "停止" : "录音"}</span><small>${enr.actif ? "Arrêter" : "M'enregistrer"}</small></button>` : ""}
+      </div>
+      ${enr.url ? `<audio class="moi" controls src="${enr.url}"></audio>
+        <div class="row" style="margin-top:8px"><button class="btn" id="b-s">${ICON.share}<span class="zh">保存 / 发给老师</span><small>Partager</small></button></div>` : ""}
+      <div class="row">
+        <button class="btn" id="encore">${ICON.repeat}<span class="zh">再练一次</span><small>Encore</small></button>
+        ${btnSuite("会了，下一句", "Suivant")}
+      </div>`);
+    $("b-a").onclick = () => joue(it, false);
+    $("b-l").onclick = () => joue(it, true);
+    if ($("b-r")) $("b-r").onclick = () => enrBascule(dessine);
+    if ($("b-s")) $("b-s").onclick = enrPartage;
+    $("encore").onclick = () => { enrVide(); dessine(); joue(it, false); };
+    $("suite").onclick = () => suivant(true);
+  };
+  dessine();
+  if (auto) joue(it, false);
+}
+
+// ---------- 听力 · Écouter ----------
+function qEcouter(auto) {
+  const it = S.items[S.i];
+  const bassin = (S.c.vocab || []).includes(it) ? S.c.vocab : phrasesDe(S.c);
+  const autres = melange(bassin.filter(x => x.zh !== it.zh).filter((x, i, a) => a.findIndex(y => y.zh === x.zh) === i)).slice(0, 3);
+  const opts = melange([it].concat(autres));
+  const dessine = choix => {
+    const fini = choix != null, juste = fini && opts[choix] === it;
+    app.innerHTML = cadre(`
+      <div class="consigne"><span class="zh">听法语，选出正确的中文意思。</span><br>Écoute et choisis le sens.</div>
+      <div class="row" style="margin-top:0">
+        <button class="btn pri" id="b-a">${ICON.speaker}<span class="zh">再听一遍</span><small>Réécouter</small></button>
+        <button class="btn" id="b-l"><span class="zh">慢速</span><small>Lent</small></button>
+      </div>
+      ${fini ? `<div class="big-fr" style="margin-top:18px">${T(it.fr)}</div>` : ""}
+      <div class="opts">${opts.map((o, k) => `<button class="opt ${fini && o === it ? "juste" : ""} ${fini && k === choix && o !== it ? "faux" : ""}" data-k="${k}" ${fini ? "disabled" : ""}>${h(o.zh)}</button>`).join("")}</div>
+      ${fini ? `<div class="row">${btnSuite("下一题", "Suivant")}</div>` : ""}`, fini ? (juste ? "ok" : "ko") : "");
+    $("b-a").onclick = () => joue(it, false);
+    $("b-l").onclick = () => joue(it, true);
+    if (fini) $("suite").onclick = () => suivant(juste);
+    else app.querySelectorAll(".opt").forEach(b => b.onclick = () => dessine(+b.dataset.k));
+  };
+  dessine(null);
+  if (auto) joue(it, false);
+}
+
+// ---------- 排序 · Remettre en ordre ----------
+function tuiles(it) { return it.fr.replace(/[«».!?…]/g, " ").replace(/,/g, " ").split(/\s+/).filter(Boolean); }
+function qOrdre() {
+  const it = S.items[S.i], bon = tuiles(it);
+  let banque = melange(bon.map((t, k) => ({ t, k })));
+  if (banque.map(x => x.t).join(" ") === bon.join(" ")) banque.reverse();
+  let pose = [], verdict = null;
+  const dessine = () => {
+    app.innerHTML = cadre(`
+      <div class="consigne"><span class="zh">点击单词，排成正确的法语句子。</span><br>Touche les mots pour former la phrase.</div>
+      <div class="big-zh prompt">${h(it.zh)}</div><div class="py">${h(it.py)}</div>
+      <div class="zone" id="zone">${pose.map((x, i) => `<button class="tuile" data-p="${i}" ${verdict != null ? "disabled" : ""}>${T(x.t)}</button>`).join("")}</div>
+      ${verdict == null ? `<div class="banque">${banque.map((x, i) => `<button class="tuile" data-b="${i}">${T(x.t)}</button>`).join("")}</div>
+        <div class="row"><button class="btn pri" id="valide" ${banque.length ? "disabled" : ""}>${ICON.check}<span class="zh">确认</span><small>Valider</small></button></div>`
+      : `<div class="note ${verdict ? "ok" : "ko"}"><span class="zh">${verdict ? "对了！" : "正确答案："}</span></div>
+        <div class="big-fr" style="margin-top:6px">${T(it.fr)}</div>
+        <div class="row"><button class="btn" id="b-a">${ICON.speaker}<span class="zh">听</span><small>Écouter</small></button>${btnSuite("下一题", "Suivant")}</div>`}`,
+      verdict == null ? "" : (verdict ? "ok" : "ko"));
+    app.querySelectorAll("[data-b]").forEach(b => b.onclick = () => { pose.push(banque.splice(+b.dataset.b, 1)[0]); dessine(); });
+    if (verdict == null) app.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { banque.push(pose.splice(+b.dataset.p, 1)[0]); dessine(); });
+    if ($("valide")) $("valide").onclick = () => { verdict = pose.map(x => x.t).join(" ") === bon.join(" "); dessine(); joue(it, false); };
+    if ($("b-a")) $("b-a").onclick = () => joue(it, false);
+    if ($("suite")) $("suite").onclick = () => suivant(verdict);
+  };
+  dessine();
+}
+
+// ---------- 口语 · Parler ----------
+function qParler() {
+  const it = S.items[S.i];
+  let phase = "attente", dit = "", note = 0;   // attente | ecoute | resultat
+  const dessine = () => {
+    const res = phase === "resultat";
+    const cl = !res ? "" : (note >= .999 ? "ok" : note >= .7 ? "mid" : (dit ? "ko" : ""));
+    app.innerHTML = cadre(`
+      <div class="consigne"><span class="zh">看中文，用法语大声说出来。</span><br>Lis le chinois et dis la phrase en français.</div>
+      <div class="big-zh prompt">${h(it.zh)}</div><div class="py">${h(it.py)}</div>
+      ${!res ? `
+        ${SR ? `<div><button class="micro ${phase === "ecoute" ? "on" : ""}" id="mic" aria-label="Parler">${phase === "ecoute" ? ICON.stop : ICON.mic}</button></div>
+          <div class="sub" style="margin-top:8px"><span class="zh">${phase === "ecoute" ? "正在听……请说法语" : "点击麦克风，然后说法语"}</span></div>` : `<div class="sub" style="margin-top:14px"><span class="zh">大声说出来，然后看答案。</span></div>`}
+        <div class="row"><button class="btn" id="voir"><span class="zh">看答案</span><small>Voir la réponse</small></button></div>`
+      : `
+        ${dit ? `<div class="entendu"><span class="zh">听到的是：</span>« ${h(dit)} »</div>
+          <div class="note ${cl}"><span class="zh">${note >= .999 ? "很好！发音很清楚。" : note >= .7 ? "差不多！再听一遍示范。" : "还不太像，听示范再试一次。"}</span></div>` : ""}
+        <div class="big-fr" style="margin-top:12px">${T(it.fr)}</div>
+        <div class="row">
+          <button class="btn" id="b-a">${ICON.speaker}<span class="zh">听示范</span><small>Modèle</small></button>
+          <button class="btn" id="b-l"><span class="zh">慢速</span><small>Lent</small></button>
+          <button class="btn" id="retente">${ICON.repeat}<span class="zh">再试一次</span><small>Réessayer</small></button>
+        </div>
+        <div class="row">${dit ? btnSuite() : `<button class="btn" id="pasencore"><span class="zh">还不会</span><small>Pas encore</small></button><button class="btn pri" id="suite">${ICON.check}<span class="zh">说对了</span><small>Je l'ai dit</small></button>`}</div>`}`, cl);
+    if ($("mic")) $("mic").onclick = ecoute;
+    if ($("voir")) $("voir").onclick = () => { stopSR(); phase = "resultat"; dessine(); joue(it, false); };
+    if ($("b-a")) $("b-a").onclick = () => joue(it, false);
+    if ($("b-l")) $("b-l").onclick = () => joue(it, true);
+    if ($("retente")) $("retente").onclick = () => { arreteAudio(); phase = "attente"; dit = ""; note = 0; dessine(); };
+    if ($("pasencore")) $("pasencore").onclick = () => suivant(false);
+    if ($("suite")) $("suite").onclick = () => suivant(dit ? note >= .999 : true);
+  };
+  const stopSR = () => { if (S.sr) { try { S.sr.onend = null; S.sr.abort(); } catch (e) {} S.sr = null; } };
+  const ecoute = () => {
+    if (phase === "ecoute") { try { S.sr.stop(); } catch (e) {} return; }
+    arreteAudio();
+    const r = new SR(); S.sr = r; r.lang = "fr-FR"; r.interimResults = false; r.maxAlternatives = 5;
+    r.onresult = e => {
+      let best = 0, txt = "";
+      for (const alt of e.results[0]) { const s = ressemble(alt.transcript, it.fr); if (s >= best) { best = s; txt = alt.transcript; } }
+      dit = txt; note = best;
+    };
+    r.onerror = e => { if (e.error === "not-allowed" || e.error === "service-not-allowed") alert("请允许使用麦克风。\nAutorise le micro pour cet exercice."); };
+    r.onend = () => { S.sr = null; if (dit) { phase = "resultat"; dessine(); if (note < .999) joue(it, false); } else { phase = "attente"; dessine(); } };
+    try { r.start(); phase = "ecoute"; dessine(); } catch (e) { phase = "attente"; dessine(); }
+  };
+  dessine();
+}
+
+// ---------- bilan ----------
+function bilan() {
+  const n = S.items.length, pc = Math.round(100 * S.ok / n);
+  marque(S.c.id, S.m.id, pc);
+  const auto = S.m.id === "repeter";
+  app.innerHTML = `<div class="ex bilan">
+    <button class="back" data-go="${S.c.id}">${ICON.arrowLeft}<span class="zh">第 ${S.c.numero} 课</span> · ${T(S.c.titre.fr)}</button>
+    <div class="stage">
+      <div class="consigne"><span class="zh">${S.m.zh}</span> · ${S.m.fr}</div>
+      <div class="score">${auto ? n : S.ok + " / " + n}</div>
+      <div class="big-zh">${auto ? "个句子练完了，很棒！" : (pc >= 85 ? "太棒了！" : pc >= 60 ? "不错，继续加油！" : "再练一次会更好。")}</div>
+      <div class="row">
+        <button class="btn" id="rejoue">${ICON.repeat}<span class="zh">再来一次</span><small>Recommencer</small></button>
+        <button class="btn pri" data-go="${S.c.id}"><span class="zh">返回课程</span><small>Retour au cours</small></button>
+      </div>
+      <div class="box acc rappel"><span class="zh">别忘了：用 WhatsApp 给老师发一条语音，老师会帮你纠正发音。</span><br><span class="sub">N'oublie pas d'envoyer un vocal WhatsApp à ton professeur : il corrigera ta prononciation.</span></div>
+    </div></div>`;
+  const c = S.c, m = S.m.id;
+  $("rejoue").onclick = () => demarre(c, m);
+}
+
+// ============================================================
+// 对话 · DIALOGUE (jeu de rôle)
+// ============================================================
+function dlgChoix() {
+  const d = S.c.dialogue, autre = Object.keys(d.roles).find(k => k !== d.eleve);
+  app.innerHTML = `<div class="ex">
+    <button class="back" data-go="${S.c.id}">${ICON.arrowLeft}<span class="zh">第 ${S.c.numero} 课</span> · ${T(S.c.titre.fr)}</button>
+    <div class="stage">
+      <div class="consigne"><span class="zh">对话 · ${h(d.titre.zh)}</span><br>Dialogue — ${T(d.titre.fr)}</div>
+      <div class="big-zh prompt">你想怎么练习？</div>
+      <div class="roles">
+        <button class="btn" data-role="">${ICON.ear}<span class="zh">先听一遍</span><small>Tout écouter</small></button>
+        <button class="btn pri" data-role="${d.eleve}">${ICON.mic}<span class="zh">我演 ${h(d.roles[d.eleve].nom)}</span><small>Je joue ${h(d.roles[d.eleve].nom)}</small></button>
+        <button class="btn" data-role="${autre}">${ICON.mic}<span class="zh">我演 ${h(d.roles[autre].nom)}</span><small>Je joue ${h(d.roles[autre].nom)}</small></button>
+      </div>
+      <div class="sub"><span class="zh">轮到你的时候：看中文提示，大声说法语，再听示范。</span></div>
+    </div></div>`;
+  app.querySelectorAll("[data-role]").forEach(b => b.onclick = () => dlgJoue(b.dataset.role));
+}
+async function dlgJoue(role) {
+  const c = S.c, d = c.dialogue, L = d.lignes, session = S;
+  let i = 0; const montre = {};   // lignes de l'élève dont le français est révélé
+  const vivant = () => S === session;
+  const dessine = tour => {
+    REG = [];
+    app.innerHTML = `<div class="ex">
+      <button class="back" data-go="${c.id}">${ICON.arrowLeft}<span class="zh">第 ${c.numero} 课</span> · ${T(c.titre.fr)}</button>
+      <div class="bar"><i style="width:${Math.round(100 * i / L.length)}%"></i></div>
+      <div class="meta"><span><span class="zh">对话</span> · ${role ? "Je joue " + h(d.roles[role].nom) : "Écoute"}</span><span>${Math.min(i + 1, L.length)} / ${L.length}</span></div>
+      <div class="fil">${L.slice(0, i + 1).map((it, k) => {
+        const moi = it.qui === role, cache = moi && !montre[k];
+        return `<div class="bulle ${moi ? "moi" : ""}" id="bu${k}"><div class="who">${h(d.roles[it.qui].nom)}</div>
+          <div class="fr ${cache ? "cache" : ""}">${cache ? "<span class='zh'>轮到你了……</span>" : T(it.fr)}</div><div class="zh">${h(it.zh)}</div><div class="py">${h(it.py)}</div></div>`;
+      }).join("")}</div>
+      ${tour ? `<div class="tour"><span class="zh"><b>轮到你了！</b>大声说法语。</span> <span class="sub">À toi : dis la phrase en français.</span>
+        <div class="row"><button class="btn" id="t-voir"><span class="zh">看法语</span><small>Voir</small></button>
+          <button class="btn" id="t-mod">${ICON.speaker}<span class="zh">听示范</span><small>Modèle</small></button>
+          ${btnSuite("下一句", "Suivant")}</div></div>` : ""}</div>`;
+    const b = $("bu" + i); if (b) b.scrollIntoView({ block: "center", behavior: "smooth" });
+  };
+  while (i < L.length && vivant()) {
+    const it = L[i];
+    if (it.qui === role) {
+      dessine(true);
+      await new Promise(res => {
+        $("t-voir").onclick = () => { montre[i] = true; const f = $("bu" + i).querySelector(".fr"); f.classList.remove("cache"); f.innerHTML = T(it.fr); };
+        $("t-mod").onclick = () => { $("t-voir").onclick(); joue(it, false, $("bu" + i)); };
+        $("suite").onclick = res;
+      });
+      if (!vivant()) return;
+      montre[i] = true; arreteAudio();
+    } else {
+      dessine(false);
+      const fini = await joue(it, false, $("bu" + i));
+      if (!vivant()) return;
+      if (fini) await pause(role ? 350 : 600);
+      if (!vivant()) return;
+    }
+    i++;
+  }
+  if (!vivant()) return;
+  S.items = L.filter(it => !role || it.qui === role); S.ok = S.items.length;
+  marque(c.id, "dialogue", 100);
+  i = L.length - 1; dessine(false);
+  app.querySelector(".ex").insertAdjacentHTML("beforeend", `<div class="tour"><span class="zh"><b>对话完成！</b></span> <span class="sub">Dialogue terminé.</span>
+    <div class="row"><button class="btn" id="d-re">${ICON.repeat}<span class="zh">再来一次</span><small>Recommencer</small></button>
+    <button class="btn pri" data-go="${c.id}"><span class="zh">返回课程</span><small>Retour au cours</small></button></div></div>`);
+  $("d-re").onclick = () => demarre(c, "dialogue");
+}
+
+// ============================================================
+// DÉMARRAGE — un QR code de PDF arrive avec ?c=c01
+// ============================================================
+(function () {
+  const q = new URLSearchParams(location.search).get("c");
+  if (q && coursPar(q) && !location.hash) { history.replaceState(null, "", location.pathname + "#" + q); }
+  if (!COURS.length) { app.innerHTML = `<p class="lead" style="margin-top:30px">Aucun cours chargé : lance <code>python outils/construire.py</code>.</p>`; return; }
+  route();
+})();
+</script>
+</body>
+</html>
