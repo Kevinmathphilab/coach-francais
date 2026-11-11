@@ -224,8 +224,8 @@ window.COURS = [
     "zh": "把“学生说……”的句子背下来：每节课都会用到。"
    },
    {
-    "fr": "Envoie-moi un vocal WhatsApp avec 5 phrases de ton choix. Je te réponds pour corriger la prononciation.",
-    "zh": "选 5 个句子，用 WhatsApp 给老师发一条语音。老师会回复并纠正发音。"
+    "fr": "Envoie-moi un vocal WeChat avec 5 phrases de ton choix. Je te réponds pour corriger la prononciation.",
+    "zh": "选 5 个句子，用微信给老师发一条语音。老师会回复并纠正发音。"
    }
   ]
  },
@@ -877,8 +877,8 @@ window.COURS = [
     "zh": "在应用里录下自己的声音，和示范对比。"
    },
    {
-    "fr": "Envoie-moi un vocal WhatsApp : présente-toi (nom, nationalité, ville). Je te réponds pour corriger la prononciation.",
-    "zh": "用 WhatsApp 给老师发一条语音：做自我介绍（名字、国籍、城市）。老师会回复并纠正发音。"
+    "fr": "Envoie-moi un vocal WeChat : présente-toi (nom, nationalité, ville). Je te réponds pour corriger la prononciation.",
+    "zh": "用微信给老师发一条语音：做自我介绍（名字、国籍、城市）。老师会回复并纠正发音。"
    },
    {
     "fr": "Avant le prochain cours : joue le dialogue sans regarder le texte.",

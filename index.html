@@ -380,7 +380,7 @@ function vueAccueil() {
     <div class="steps">
       <div class="step"><div class="n">1 · 课前 AVANT</div><div class="t zh">听音频，跟读</div><div class="sub">Écouter et répéter</div></div>
       <div class="step"><div class="n">2 · 上课 PENDANT</div><div class="t zh">和老师对话</div><div class="sub">Parler avec le professeur</div></div>
-      <div class="step"><div class="n">3 · 课后 APRÈS</div><div class="t zh">用 WhatsApp 发语音</div><div class="sub">Envoyer un vocal WhatsApp</div></div>
+      <div class="step"><div class="n">3 · 课后 APRÈS</div><div class="t zh">用微信发语音</div><div class="sub">Envoyer un vocal WeChat</div></div>
     </div>
     <h2><span class="zh">课程</span><span class="sub">Les cours</span></h2>
     <div class="cards">${COURS.map(c => `
@@ -621,7 +621,7 @@ function bilan() {
         <button class="btn" id="rejoue">${ICON.repeat}<span class="zh">再来一次</span><small>Recommencer</small></button>
         <button class="btn pri" data-go="${S.c.id}"><span class="zh">返回课程</span><small>Retour au cours</small></button>
       </div>
-      <div class="box acc rappel"><span class="zh">别忘了：用 WhatsApp 给老师发一条语音，老师会帮你纠正发音。</span><br><span class="sub">N'oublie pas d'envoyer un vocal WhatsApp à ton professeur : il corrigera ta prononciation.</span></div>
+      <div class="box acc rappel"><span class="zh">别忘了：用微信给老师发一条语音，老师会帮你纠正发音。</span><br><span class="sub">N'oublie pas d'envoyer un vocal WeChat à ton professeur : il corrigera ta prononciation.</span></div>
     </div></div>`;
   const c = S.c, m = S.m.id;
   $("rejoue").onclick = () => demarre(c, m);
