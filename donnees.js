@@ -2054,7 +2054,7 @@ window.COURS = [
     "fr": "La photo de famille",
     "zh": "全家福"
    },
-   "image": "images/photo_famille_lin.png",
+   "image": "images/photo_famille_lin.jpg",
    "legende": {
     "fr": "Paul, Lin, Léo, Emma et Max, le chien.",
     "zh": "保罗、琳、莱奥、艾玛，还有小狗 Max。"
