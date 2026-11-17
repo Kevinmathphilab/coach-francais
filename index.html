@@ -138,6 +138,9 @@ details.rep .r{display:flex;align-items:center;gap:8px;margin-top:6px;font-weigh
 .rempli{color:var(--accent);border-bottom:2px solid var(--accent);padding:0 2px}
 .opt.lat{font-family:var(--font);font-weight:600;text-align:center}
 .opts.grille{grid-template-columns:1fr 1fr}
+.photo{margin:6px auto 14px;max-width:460px;text-align:center}
+.photo img{display:block;width:100%;height:auto;border-radius:6px}
+.photo figcaption{margin-top:6px;font-size:.92rem}
 .son{display:grid;grid-template-columns:120px 1fr;gap:14px;padding:12px 14px;border-top:1px solid var(--line);align-items:start}
 .son:first-child{border-top:0}
 .son .s{color:var(--accent);font-weight:700;font-size:1.1rem}
@@ -443,6 +446,7 @@ function vueCours(c) {
   if (c.dialogue) {
     const d = c.dialogue;
     o += `<h2><span class="zh">对话：${h(d.titre.zh)}</span><span class="sub">Dialogue — ${T(d.titre.fr)}</span></h2>
+      ${photoDlg(d)}
       <div class="list">${d.lignes.map(it => ligneItem(Object.assign({}, it, { _qui: d.roles[it.qui].nom }), it.qui === d.eleve ? "eleve" : "")).join("")}</div>
       <div class="row" style="justify-content:flex-start"><button class="btn pri" data-go="${c.id}/dialogue">${ICON.chat}<span class="zh">角色扮演</span><small>Jouer le dialogue</small></button></div>`;
   }
@@ -684,12 +688,19 @@ function bilan() {
 // ============================================================
 // 对话 · DIALOGUE (jeu de rôle)
 // ============================================================
+// Photo (ou image) qui accompagne un dialogue, avec sa légende bilingue
+function photoDlg(d) {
+  if (!d.image) return "";
+  return `<figure class="photo"><img src="${h(d.image)}" alt="${h(d.legende ? d.legende.fr : d.titre.fr)}" loading="lazy">
+    ${d.legende ? `<figcaption><span class="zh">${h(d.legende.zh)}</span><br><span class="sub">${T(d.legende.fr)}</span></figcaption>` : ""}</figure>`;
+}
 function dlgChoix() {
   const d = S.c.dialogue, autre = Object.keys(d.roles).find(k => k !== d.eleve);
   app.innerHTML = `<div class="ex">
     <button class="back" data-go="${S.c.id}">${ICON.arrowLeft}<span class="zh">第 ${S.c.numero} 课</span> · ${T(S.c.titre.fr)}</button>
     <div class="stage">
       <div class="consigne"><span class="zh">对话 · ${h(d.titre.zh)}</span><br>Dialogue — ${T(d.titre.fr)}</div>
+      ${photoDlg(d)}
       <div class="big-zh prompt">你想怎么练习？</div>
       <div class="roles">
         <button class="btn" data-role="">${ICON.ear}<span class="zh">先听一遍</span><small>Tout écouter</small></button>

@@ -2054,6 +2054,11 @@ window.COURS = [
     "fr": "La photo de famille",
     "zh": "全家福"
    },
+   "image": "images/photo_famille_lin.png",
+   "legende": {
+    "fr": "Paul, Lin, Léo, Emma et Max, le chien.",
+    "zh": "保罗、琳、莱奥、艾玛，还有小狗 Max。"
+   },
    "roles": {
     "K": {
      "nom": "Kévin",
@@ -2254,22 +2259,22 @@ window.COURS = [
       "l": "audio/d2bbff9b915bd0.mp3"
      },
      {
-      "fr": "Je ▢ trente-cinq ans.",
-      "rep": "ai",
+      "fr": "▢ trente-cinq ans.",
+      "rep": "J'ai",
       "opts": [
-       "ai",
-       "suis",
-       "as",
-       "es"
+       "J'ai",
+       "Je suis",
+       "Je ai",
+       "Je as"
       ],
       "zh": "我三十五岁。",
       "note": {
-       "zh": "说年龄要用 avoir：j'ai … ans。",
-       "fr": "L'âge se dit avec avoir."
+       "zh": "说年龄要用 avoir。je 在元音前要缩写成 j'：j'ai，不说 je ai。",
+       "fr": "L'âge se dit avec avoir. Devant une voyelle, je devient j' : j'ai (jamais « je ai »)."
       },
-      "dire": "Je ai trente-cinq ans.",
-      "a": "audio/ff4cb44bcc0c7b.mp3",
-      "l": "audio/3ce233223f6a8a.mp3"
+      "dire": "J'ai trente-cinq ans.",
+      "a": "audio/68a9a39fc84766.mp3",
+      "l": "audio/85dab5e422ddd2.mp3"
      },
      {
       "fr": "Paul ▢ trente-huit ans.",
