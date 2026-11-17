@@ -91,7 +91,7 @@ h2 .sub{font-weight:500}
 .back{background:none;border:0;padding:6px 0;margin-top:14px;color:var(--ink-3);display:inline-flex;align-items:center;gap:6px;font-size:.9rem}
 .back:hover{color:var(--accent)}
 .kicker{color:var(--accent);font-weight:700;font-size:.82rem;letter-spacing:.08em;margin-top:6px}
-.modes{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:18px 0 4px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px;margin:18px 0 4px}
 .mode{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:12px 10px;text-align:center;position:relative;transition:border-color .15s}
 .mode:hover{border-color:var(--accent)}
 .mode .ico{color:var(--accent);font-size:1.35rem;display:flex;justify-content:center}
@@ -128,6 +128,16 @@ h2 .sub{font-weight:500}
 .notion th{text-align:left;font-weight:500;color:var(--ink-3);font-size:.8rem;border-bottom:1px solid var(--line-2);padding:4px 10px 4px 0}
 .notion td{padding:5px 10px 5px 0;border-bottom:1px solid var(--line)}
 .notion td:first-child{font-weight:600}
+.notion .list{margin-top:10px}
+.forme{color:var(--accent);font-weight:700;font-size:.82rem;display:block}
+details.rep{margin-top:4px}
+details.rep summary{cursor:pointer;color:var(--accent);font-size:.84rem;list-style:none}
+details.rep summary::-webkit-details-marker{display:none}
+details.rep .r{display:flex;align-items:center;gap:8px;margin-top:6px;font-weight:600}
+.trou{display:inline-block;min-width:3.2em;border-bottom:2px solid var(--accent);margin:0 2px}
+.rempli{color:var(--accent);border-bottom:2px solid var(--accent);padding:0 2px}
+.opt.lat{font-family:var(--font);font-weight:600;text-align:center}
+.opts.grille{grid-template-columns:1fr 1fr}
 .son{display:grid;grid-template-columns:120px 1fr;gap:14px;padding:12px 14px;border-top:1px solid var(--line);align-items:start}
 .son:first-child{border-top:0}
 .son .s{color:var(--accent);font-weight:700;font-size:1.1rem}
@@ -231,6 +241,7 @@ const ICON = {
   ear: SVG('<path d="M6.5 9.5a5.5 5.5 0 1 1 11 0c0 3-2.6 3.6-3.2 6-.5 2-1.4 4-3.6 4-1.7 0-2.7-1.1-2.7-2.5"/><path d="M9.5 9.5a2.5 2.5 0 1 1 5 0"/>'),
   tiles: SVG('<rect x="3" y="8" width="5.5" height="8" rx="1.3"/><rect x="9.3" y="8" width="5.5" height="8" rx="1.3"/><rect x="15.6" y="8" width="5.5" height="8" rx="1.3"/>'),
   chat: SVG('<path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3.5V15H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M19 9.5h1a2 2 0 0 1 2 2V16a2 2 0 0 1-2 2v2.5L17.5 18"/>'),
+  pen: SVG('<path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
   repeat: SVG('<path d="M4 11V9a3 3 0 0 1 3-3h11"/><path d="m15 3 3 3-3 3"/><path d="M20 13v2a3 3 0 0 1-3 3H6"/><path d="m9 21-3-3 3-3"/>'),
   arrowLeft: SVG('<path d="M19 12H5.5"/><path d="m11 6-5.5 6L11 18"/>'),
   arrowRight: SVG('<path d="M5 12h13.5"/><path d="m13 6 5.5 6L13 18"/>'),
@@ -263,6 +274,7 @@ const MODES = [
   { id: "ecouter",  zh: "听力", fr: "Écouter",  ico: "ear",    desc: "听法语，选中文意思" },
   { id: "ordre",    zh: "排序", fr: "Ordre",    ico: "tiles",  desc: "把法语单词排成句子" },
   { id: "parler",   zh: "口语", fr: "Parler",   ico: "mic",    desc: "看中文，说法语" },
+  { id: "completer", zh: "填空", fr: "Compléter", ico: "pen",  desc: "选出正确的词，填进句子" },
   { id: "dialogue", zh: "对话", fr: "Dialogue", ico: "chat",   desc: "角色扮演" }
 ];
 function marque(cid, mode, score) {
@@ -396,9 +408,12 @@ document.addEventListener("click", e => { const b = e.target.closest("[data-go]"
 // ============================================================
 // PAGE D'UN COURS
 // ============================================================
-const phrasesDe = c => (c.groupes || []).flatMap(g => g.items);
-const modesDe = c => MODES.filter(m => m.id !== "dialogue" || c.dialogue);
-const ligneItem = (it, extra = "") => `<div class="item ${extra}">${boutons(it)}<div class="fr">${it._qui ? `<span class="who">${h(it._qui)}</span>` : ""}${T(it.fr)}</div><div class="tz"><div class="zh">${h(it.zh)}</div><div class="py">${h(it.py)}</div></div></div>`;
+// Phrases « à pratiquer » (groupes sauf ceux marqués pratique:false, ex. les nombres)
+const phrasesDe = c => (c.groupes || []).filter(g => g.pratique !== false).flatMap(g => g.items);
+const exemplesDe = c => (c.notions || []).flatMap(n => n.exemples || []);
+const trousDe = c => (c.exercices || []).flatMap(e => e.items.filter(it => it.opts));
+const modesDe = c => MODES.filter(m => (m.id !== "dialogue" || c.dialogue) && (m.id !== "completer" || trousDe(c).length));
+const ligneItem = (it, extra = "") => `<div class="item ${extra}">${boutons(it)}<div class="fr">${it._qui ? `<span class="who">${h(it._qui)}</span>` : ""}${it.forme ? `<span class="forme">${T(it.forme)}</span>` : ""}${T(it.fr)}</div><div class="tz"><div class="zh">${h(it.zh)}</div><div class="py">${h(it.py)}</div></div></div>`;
 const bi = d => `<span class="zh">${h(d.zh)}</span><span class="sub"> ${T(d.fr)}</span>`;
 
 function vueCours(c) {
@@ -420,15 +435,29 @@ function vueCours(c) {
     <div class="notion"><h3><span class="zh">${i + 1}. ${h(n.titre.zh)}</span><span class="sub">${T(n.titre.fr)}</span></h3>
       <p class="zh">${h(n.texte.zh)}</p><p class="sub">${T(n.texte.fr)}</p>
       ${n.table ? `<table><tr>${n.table.entetes.map(e => `<th class="zh">${h(e)}</th>`).join("")}</tr>${n.table.lignes.map(l => `<tr>${l.map(x => `<td>${T(x)}</td>`).join("")}</tr>`).join("")}</table>` : ""}
+      ${n.exemples ? `<div class="list">${n.exemples.map(it => ligneItem(it)).join("")}</div>` : ""}
     </div>`).join("");
 
-  (c.groupes || []).forEach(g => { o += `<h2><span class="zh">${h(g.titre.zh)}</span><span class="sub">${T(g.titre.fr)}</span></h2><div class="list">${g.items.map(it => ligneItem(it)).join("")}</div>`; });
+  (c.groupes || []).forEach(g => { o += `<h2><span class="zh">${h(g.titre.zh)}</span><span class="sub">${T(g.titre.fr)}</span></h2><div class="list ${g.colonnes === 2 ? "vocab" : ""}">${g.items.map(it => ligneItem(it)).join("")}</div>`; });
 
   if (c.dialogue) {
     const d = c.dialogue;
     o += `<h2><span class="zh">对话：${h(d.titre.zh)}</span><span class="sub">Dialogue — ${T(d.titre.fr)}</span></h2>
       <div class="list">${d.lignes.map(it => ligneItem(Object.assign({}, it, { _qui: d.roles[it.qui].nom }), it.qui === d.eleve ? "eleve" : "")).join("")}</div>
       <div class="row" style="justify-content:flex-start"><button class="btn pri" data-go="${c.id}/dialogue">${ICON.chat}<span class="zh">角色扮演</span><small>Jouer le dialogue</small></button></div>`;
+  }
+
+  if (c.exercices) {
+    o += `<h2><span class="zh">练习</span><span class="sub">Exercices</span></h2>`;
+    c.exercices.forEach((ex, k) => {
+      const qcm = ex.items.some(it => it.opts);
+      o += `<div class="notion"><h3><span class="zh">${k + 1}. ${h(ex.titre.zh)}</span><span class="sub">${T(ex.titre.fr)}</span></h3>
+        <p class="zh">${h(ex.consigne.zh)}</p><p class="sub">${T(ex.consigne.fr)}</p>`;
+      if (qcm) o += `<div class="row" style="justify-content:flex-start;margin-top:10px"><button class="btn pri" data-go="${c.id}/completer">${ICON.pen}<span class="zh">开始填空</span><small>Commencer</small></button></div>`;
+      else o += `<div class="list">${ex.items.map(it => `<div class="item">${boutons(it)}<div class="fr">${T(it.fr)}</div><div class="tz"><div class="zh">${h(it.zh)}</div>
+          <details class="rep"><summary class="zh">看答案 · Réponse</summary><div class="r">${boutons(it.rep)}<span>${T(it.rep.fr)}</span></div></details></div></div>`).join("")}</div>`;
+      o += `</div>`;
+    });
   }
 
   if (c.prononciation) o += `<h2><span class="zh">发音</span><span class="sub">Prononciation</span></h2><div class="list">${c.prononciation.map(p => `
@@ -448,15 +477,17 @@ function demarre(c, mode) {
   const m = MODES.find(x => x.id === mode);
   S = { c, m, i: 0, ok: 0, etat: null };
   if (mode === "dialogue") return c.dialogue ? dlgChoix() : (location.hash = c.id);
-  const ph = phrasesDe(c);
+  const ph = phrasesDe(c), exs = exemplesDe(c);
+  const tousGroupes = (c.groupes || []).flatMap(g => g.items);
   if (mode === "repeter") S.items = ph;
-  if (mode === "ecouter") S.items = melange(ph.concat(c.vocab || [])).slice(0, 12);
+  if (mode === "ecouter") S.items = melange(tousGroupes.concat(exs, c.vocab || [])).slice(0, 12);
   if (mode === "ordre") {
     const vus = new Set();
-    const tout = ph.concat(c.dialogue ? c.dialogue.lignes : []).filter(it => { const k = it.fr; if (vus.has(k)) return false; vus.add(k); return tuiles(it).length >= 3; });
+    const tout = ph.concat(exs, c.dialogue ? c.dialogue.lignes : []).filter(it => { const k = it.fr; if (vus.has(k)) return false; vus.add(k); return tuiles(it).length >= 3; });
     S.items = melange(tout).slice(0, 10);
   }
-  if (mode === "parler") S.items = melange(ph).slice(0, 12);
+  if (mode === "parler") S.items = melange(ph.concat(exs)).slice(0, 12);
+  if (mode === "completer") S.items = melange(trousDe(c)).slice(0, 15);
   if (!S.items.length) { location.hash = c.id; return; }
   question(true);
 }
@@ -471,7 +502,7 @@ function cadre(contenu, classe = "") {
 function suivant(juste) { if (juste) S.ok++; S.i++; enrVide(); if (S.i >= S.items.length) return bilan(); question(true); }
 function question(auto) {
   REG = []; S.etat = null;
-  ({ repeter: qRepeter, ecouter: qEcouter, ordre: qOrdre, parler: qParler })[S.m.id](auto);
+  ({ repeter: qRepeter, ecouter: qEcouter, ordre: qOrdre, parler: qParler, completer: qCompleter })[S.m.id](auto);
 }
 const btnSuite = (txtZh = "下一句", txtFr = "Suivant") => `<button class="btn pri" id="suite"><span class="zh">${txtZh}</span><small>${txtFr}</small>${ICON.arrowRight}</button>`;
 
@@ -507,7 +538,9 @@ function qRepeter(auto) {
 // ---------- 听力 · Écouter ----------
 function qEcouter(auto) {
   const it = S.items[S.i];
-  const bassin = (S.c.vocab || []).includes(it) ? S.c.vocab : phrasesDe(S.c);
+  // Les mauvaises réponses viennent du même ensemble (vocabulaire, nombres, exemples d'une notion…)
+  const ensembles = [S.c.vocab || []].concat((S.c.groupes || []).map(g => g.items), (S.c.notions || []).map(n => n.exemples || []));
+  const bassin = ensembles.find(e => e.includes(it) && e.length >= 4) || phrasesDe(S.c).concat(exemplesDe(S.c));
   const autres = melange(bassin.filter(x => x.zh !== it.zh).filter((x, i, a) => a.findIndex(y => y.zh === x.zh) === i)).slice(0, 3);
   const opts = melange([it].concat(autres));
   const dessine = choix => {
@@ -604,6 +637,27 @@ function qParler() {
     try { r.start(); phase = "ecoute"; dessine(); } catch (e) { phase = "attente"; dessine(); }
   };
   dessine();
+}
+
+// ---------- 填空 · Compléter (phrase à trou, 4 choix) ----------
+function qCompleter() {
+  const it = S.items[S.i];
+  const opts = melange(it.opts);
+  const dessine = choix => {
+    const fini = choix != null, juste = fini && opts[choix] === it.rep;
+    const phrase = T(it.fr).replace("▢", fini ? `<span class="rempli">${T(it.rep)}</span>` : `<span class="trou">&nbsp;</span>`);
+    app.innerHTML = cadre(`
+      <div class="consigne"><span class="zh">选出正确的词，填进句子。</span><br>Choisis le bon mot pour compléter la phrase.</div>
+      <div class="big-fr">${phrase}</div>
+      <div class="big-zh">${h(it.zh)}</div>
+      <div class="opts grille">${opts.map((o, k) => `<button class="opt lat ${fini && o === it.rep ? "juste" : ""} ${fini && k === choix && o !== it.rep ? "faux" : ""}" data-k="${k}" ${fini ? "disabled" : ""}>${T(o)}</button>`).join("")}</div>
+      ${fini ? `${it.note ? `<div class="note ${juste ? "ok" : "ko"}"><span class="zh">${h(it.note.zh)}</span><br><span class="sub">${T(it.note.fr)}</span></div>` : `<div class="note ${juste ? "ok" : "ko"}"><span class="zh">${juste ? "对了！" : "再看一下正确答案。"}</span></div>`}
+        <div class="row"><button class="btn" id="b-a">${ICON.speaker}<span class="zh">听整句</span><small>Écouter</small></button>${btnSuite("下一题", "Suivant")}</div>` : ""}`,
+      fini ? (juste ? "ok" : "ko") : "");
+    if (fini) { $("b-a").onclick = () => joue(it, false); $("suite").onclick = () => suivant(juste); }
+    else app.querySelectorAll(".opt").forEach(b => b.onclick = () => { const k = +b.dataset.k; dessine(k); joue(it, false); });
+  };
+  dessine(null);
 }
 
 // ---------- bilan ----------
