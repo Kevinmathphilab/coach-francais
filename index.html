@@ -187,6 +187,11 @@ details.rep .r{display:flex;align-items:center;gap:8px;margin-top:6px;font-weigh
 .note.ok{color:var(--jade)} .note.ko{color:var(--err)} .note.mid{color:var(--amber)}
 .entendu{margin-top:10px;color:var(--ink-2);font-size:.95rem}
 audio.moi{margin-top:14px;width:100%;max-width:340px}
+.envoi{margin:18px auto 0;max-width:420px;border:1px solid var(--line);border-left:3px solid var(--jade);border-radius:var(--r);background:var(--jade-soft);padding:12px 14px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.envoi-t{font-weight:600;font-size:.92rem}
+.envoi audio.moi{margin-top:0}
+.envoi-b{width:100%;justify-content:center;min-height:52px;font-size:1.05rem}
+.envoi .note{margin-top:0}
 
 /* dialogue */
 .roles{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:16px 0}
@@ -350,12 +355,22 @@ async function enrBascule(apres) {
   } catch (e) { alert("无法使用麦克风，请在浏览器中允许麦克风权限。\nMicro indisponible : autorise le micro dans le navigateur."); }
 }
 function enrVide() { if (enr.actif) { try { enr.rec.onstop = null; enr.rec.stop(); } catch (e) {} } enr.actif = false; enr.blob = null; if (enr.url) URL.revokeObjectURL(enr.url); enr.url = null; }
-async function enrPartage() {
-  if (!enr.blob) return;
+// Navigateur intégré de WeChat : micro et partage y fonctionnent mal → on conseille d'ouvrir dans le navigateur.
+const dansWeChat = /MicroMessenger/i.test(navigator.userAgent);
+const peutPartagerFichier = (() => { try { return !!(navigator.canShare && navigator.canShare({ files: [new File(["x"], "t.m4a", { type: "audio/mp4" })] })); } catch (e) { return false; } })();
+// Envoie l'enregistrement : menu de partage du téléphone (→ WeChat), sinon téléchargement du fichier.
+// Le nom du fichier dit au professeur de quelle phrase il s'agit (ex. « Cours02-phrase05.m4a »).
+async function enrPartage(it, numero) {
+  if (!enr.blob) return "rien";
   const ext = /mp4|aac|m4a/.test(enr.blob.type) ? "m4a" : (/ogg/.test(enr.blob.type) ? "ogg" : "webm");
-  const f = new File([enr.blob], "mon-francais." + ext, { type: enr.blob.type });
-  if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: "Mon français" }); } catch (e) {} }
-  else { const a = document.createElement("a"); a.href = enr.url; a.download = f.name; a.click(); }
+  const nom = `Cours${String(S.c.numero).padStart(2, "0")}-phrase${String(numero).padStart(2, "0")}.${ext}`;
+  const f = new File([enr.blob], nom, { type: enr.blob.type });
+  if (navigator.canShare && navigator.canShare({ files: [f] })) {
+    try { await navigator.share({ files: [f], title: nom, text: it.fr }); return "partage"; }
+    catch (e) { return e && e.name === "AbortError" ? "annule" : "echec"; }
+  }
+  const a = document.createElement("a"); a.href = enr.url; a.download = nom; document.body.appendChild(a); a.click(); a.remove();
+  return "telecharge";
 }
 
 // ============================================================
@@ -513,8 +528,16 @@ const btnSuite = (txtZh = "下一句", txtFr = "Suivant") => `<button class="btn
 // ---------- 跟读 · Répéter ----------
 function qRepeter(auto) {
   const it = S.items[S.i];
+  let envoi = "";   // "" | partage | telecharge | annule | echec
+  const etatEnvoi = {
+    partage: `<span class="zh">已发送！老师会回复你。</span><br><span class="sub">Envoyé ! Ton professeur te répondra.</span>`,
+    telecharge: `<span class="zh">录音文件已下载。请在微信里把这个文件发给老师。</span><br><span class="sub">Fichier téléchargé : envoie-le à ton professeur dans WeChat.</span>`,
+    annule: `<span class="zh">没有发送。想发的话，再点一次上面的按钮。</span><br><span class="sub">Pas envoyé : appuie à nouveau sur le bouton si tu veux.</span>`,
+    echec: `<span class="zh">发送失败。请点右上角“…”，选择“在浏览器中打开”，再试一次；或者直接在微信里发语音。</span><br><span class="sub">Échec : ouvre la page dans le navigateur, ou envoie un vocal WeChat.</span>`
+  };
   const dessine = () => {
     app.innerHTML = cadre(`
+      ${dansWeChat && peutEnregistrer ? `<div class="note mid" style="margin:0 0 12px"><span class="zh">在微信里，录音可能用不了。请点右上角“…”，选择“在浏览器中打开”。</span><br><span class="sub">Dans WeChat, le micro peut ne pas marcher : ouvre la page dans le navigateur.</span></div>` : ""}
       <div class="consigne"><span class="zh">先听，再大声跟读。可以录音，和示范对比。</span><br>Écoute, répète à voix haute, puis compare ta voix au modèle.</div>
       <div class="big-fr">${T(it.fr)}</div><div class="big-zh">${h(it.zh)}</div><div class="py">${h(it.py)}</div>
       <div class="row">
@@ -522,17 +545,22 @@ function qRepeter(auto) {
         <button class="btn" id="b-l">${ICON.speaker}<span class="zh">慢速</span><small>Lent</small></button>
         ${peutEnregistrer ? `<button class="btn rec ${enr.actif ? "on" : ""}" id="b-r">${enr.actif ? ICON.stop : ICON.mic}<span class="zh">${enr.actif ? "停止" : "录音"}</span><small>${enr.actif ? "Arrêter" : "M'enregistrer"}</small></button>` : ""}
       </div>
-      ${enr.url ? `<audio class="moi" controls src="${enr.url}"></audio>
-        <div class="row" style="margin-top:8px"><button class="btn" id="b-s">${ICON.share}<span class="zh">保存 / 发给老师</span><small>Partager</small></button></div>` : ""}
+      ${enr.url ? `<div class="envoi">
+          <div class="envoi-t"><span class="zh">你的录音</span> · <span class="sub">Ton enregistrement</span></div>
+          <audio class="moi" controls src="${enr.url}"></audio>
+          <button class="btn pri envoi-b" id="b-s">${ICON.share}<span class="zh">${peutPartagerFichier ? "发给老师（微信）" : "下载录音，发给老师"}</span><small>${peutPartagerFichier ? "Envoyer au professeur" : "Télécharger"}</small></button>
+          <div class="sub">${peutPartagerFichier ? "<span class='zh'>点按钮 → 选择“微信” → 选老师 → 发送</span><br>Bouton → WeChat → ton professeur → Envoyer" : "<span class='zh'>文件下载后，在微信里发给老师。</span><br>Ensuite, envoie le fichier dans WeChat."}</div>
+          ${envoi ? `<div class="note ${envoi === "partage" ? "ok" : envoi === "telecharge" ? "ok" : envoi === "annule" ? "mid" : "ko"}">${etatEnvoi[envoi]}</div>` : ""}
+        </div>` : ""}
       <div class="row">
         <button class="btn" id="encore">${ICON.repeat}<span class="zh">再练一次</span><small>Encore</small></button>
         ${btnSuite("会了，下一句", "Suivant")}
       </div>`);
     $("b-a").onclick = () => joue(it, false);
     $("b-l").onclick = () => joue(it, true);
-    if ($("b-r")) $("b-r").onclick = () => enrBascule(dessine);
-    if ($("b-s")) $("b-s").onclick = enrPartage;
-    $("encore").onclick = () => { enrVide(); dessine(); joue(it, false); };
+    if ($("b-r")) $("b-r").onclick = () => { envoi = ""; enrBascule(dessine); };
+    if ($("b-s")) $("b-s").onclick = async () => { envoi = await enrPartage(it, S.i + 1); dessine(); };
+    $("encore").onclick = () => { envoi = ""; enrVide(); dessine(); joue(it, false); };
     $("suite").onclick = () => suivant(true);
   };
   dessine();
