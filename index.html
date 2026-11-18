@@ -235,7 +235,7 @@ audio.moi{margin-top:14px;width:100%;max-width:340px}
 </div></div>
 <div class="wrap" id="app"></div>
 
-<script src="donnees.js"></script>
+<script src="donnees.js?v=6ae525de7f"></script>
 <script>
 "use strict";
 // ============================================================
@@ -341,7 +341,9 @@ async function enrBascule(apres) {
   try {
     const flux = await navigator.mediaDevices.getUserMedia({ audio: true });
     const morceaux = [];
-    enr.rec = new MediaRecorder(flux);
+    // M4A de préférence : lisible directement dans WeChat sur téléphone (le WebM ne l'est pas toujours)
+    const format = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm"].find(t => window.MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t));
+    enr.rec = format ? new MediaRecorder(flux, { mimeType: format }) : new MediaRecorder(flux);
     enr.rec.ondataavailable = e => morceaux.push(e.data);
     enr.rec.onstop = () => {
       flux.getTracks().forEach(t => t.stop());
@@ -356,8 +358,15 @@ async function enrBascule(apres) {
 }
 function enrVide() { if (enr.actif) { try { enr.rec.onstop = null; enr.rec.stop(); } catch (e) {} } enr.actif = false; enr.blob = null; if (enr.url) URL.revokeObjectURL(enr.url); enr.url = null; }
 // Navigateur intégré de WeChat : micro et partage y fonctionnent mal → on conseille d'ouvrir dans le navigateur.
-const dansWeChat = /MicroMessenger/i.test(navigator.userAgent);
-const peutPartagerFichier = (() => { try { return !!(navigator.canShare && navigator.canShare({ files: [new File(["x"], "t.m4a", { type: "audio/mp4" })] })); } catch (e) { return false; } })();
+const dansWeChat = /MicroMessenger/i.test(navigator.userAgent);   // WeChat, sur téléphone comme sur ordinateur
+const surTelephone = /Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+// Le menu de partage n'est utile que sur téléphone (il propose WeChat) ; sur ordinateur on télécharge le fichier.
+const peutPartagerFichier = !dansWeChat && surTelephone && (() => { try { return !!(navigator.canShare && navigator.canShare({ files: [new File(["x"], "t.m4a", { type: "audio/mp4" })] })); } catch (e) { return false; } })();
+async function copierLien(bouton) {
+  const lien = location.origin + location.pathname + location.hash;
+  try { await navigator.clipboard.writeText(lien); bouton.innerHTML = `${ICON.check}<span class="zh">链接已复制</span><small>Lien copié</small>`; }
+  catch (e) { prompt("复制这个链接，在浏览器（Chrome / Edge）中打开：\nCopie ce lien et ouvre-le dans le navigateur :", lien); }
+}
 // Envoie l'enregistrement : menu de partage du téléphone (→ WeChat), sinon téléchargement du fichier.
 // Le nom du fichier dit au professeur de quelle phrase il s'agit (ex. « Cours02-phrase05.m4a »).
 async function enrPartage(it, numero) {
@@ -365,7 +374,7 @@ async function enrPartage(it, numero) {
   const ext = /mp4|aac|m4a/.test(enr.blob.type) ? "m4a" : (/ogg/.test(enr.blob.type) ? "ogg" : "webm");
   const nom = `Cours${String(S.c.numero).padStart(2, "0")}-phrase${String(numero).padStart(2, "0")}.${ext}`;
   const f = new File([enr.blob], nom, { type: enr.blob.type });
-  if (navigator.canShare && navigator.canShare({ files: [f] })) {
+  if (peutPartagerFichier && navigator.canShare({ files: [f] })) {
     try { await navigator.share({ files: [f], title: nom, text: it.fr }); return "partage"; }
     catch (e) { return e && e.name === "AbortError" ? "annule" : "echec"; }
   }
@@ -531,13 +540,12 @@ function qRepeter(auto) {
   let envoi = "";   // "" | partage | telecharge | annule | echec
   const etatEnvoi = {
     partage: `<span class="zh">已发送！老师会回复你。</span><br><span class="sub">Envoyé ! Ton professeur te répondra.</span>`,
-    telecharge: `<span class="zh">录音文件已下载。请在微信里把这个文件发给老师。</span><br><span class="sub">Fichier téléchargé : envoie-le à ton professeur dans WeChat.</span>`,
+    telecharge: `<span class="zh">录音文件已下载（在“下载”文件夹里）。打开微信，把这个文件拖进和老师的聊天窗口。</span><br><span class="sub">Fichier téléchargé (dossier Téléchargements) : fais-le glisser dans la conversation WeChat avec ton professeur.</span>`,
     annule: `<span class="zh">没有发送。想发的话，再点一次上面的按钮。</span><br><span class="sub">Pas envoyé : appuie à nouveau sur le bouton si tu veux.</span>`,
     echec: `<span class="zh">发送失败。请点右上角“…”，选择“在浏览器中打开”，再试一次；或者直接在微信里发语音。</span><br><span class="sub">Échec : ouvre la page dans le navigateur, ou envoie un vocal WeChat.</span>`
   };
   const dessine = () => {
     app.innerHTML = cadre(`
-      ${dansWeChat && peutEnregistrer ? `<div class="note mid" style="margin:0 0 12px"><span class="zh">在微信里，录音可能用不了。请点右上角“…”，选择“在浏览器中打开”。</span><br><span class="sub">Dans WeChat, le micro peut ne pas marcher : ouvre la page dans le navigateur.</span></div>` : ""}
       <div class="consigne"><span class="zh">先听，再大声跟读。可以录音，和示范对比。</span><br>Écoute, répète à voix haute, puis compare ta voix au modèle.</div>
       <div class="big-fr">${T(it.fr)}</div><div class="big-zh">${h(it.zh)}</div><div class="py">${h(it.py)}</div>
       <div class="row">
@@ -548,9 +556,15 @@ function qRepeter(auto) {
       ${enr.url ? `<div class="envoi">
           <div class="envoi-t"><span class="zh">你的录音</span> · <span class="sub">Ton enregistrement</span></div>
           <audio class="moi" controls src="${enr.url}"></audio>
+          ${dansWeChat ? `
+          <div class="note mid" style="text-align:left"><span class="zh"><b>在微信里打开的页面不能发送录音。</b>请选一个方法：<br>
+            1. 复制链接，用浏览器（Chrome 或 Edge）打开，再录一次，就可以下载并发给老师；<br>
+            2. 或者用手机：在应用里听句子，然后直接在微信里给老师发语音。</span><br>
+            <span class="sub">Dans WeChat, l'envoi est bloqué : ouvre le lien dans Chrome ou Edge, ou envoie un vocal WeChat depuis ton téléphone.</span></div>
+          <button class="btn pri envoi-b" id="b-lien">${ICON.share}<span class="zh">复制链接</span><small>Copier le lien</small></button>` : `
           <button class="btn pri envoi-b" id="b-s">${ICON.share}<span class="zh">${peutPartagerFichier ? "发给老师（微信）" : "下载录音，发给老师"}</span><small>${peutPartagerFichier ? "Envoyer au professeur" : "Télécharger"}</small></button>
-          <div class="sub">${peutPartagerFichier ? "<span class='zh'>点按钮 → 选择“微信” → 选老师 → 发送</span><br>Bouton → WeChat → ton professeur → Envoyer" : "<span class='zh'>文件下载后，在微信里发给老师。</span><br>Ensuite, envoie le fichier dans WeChat."}</div>
-          ${envoi ? `<div class="note ${envoi === "partage" ? "ok" : envoi === "telecharge" ? "ok" : envoi === "annule" ? "mid" : "ko"}">${etatEnvoi[envoi]}</div>` : ""}
+          <div class="sub">${peutPartagerFichier ? "<span class='zh'>点按钮 → 选择“微信” → 选老师 → 发送</span><br>Bouton → WeChat → ton professeur → Envoyer" : "<span class='zh'>文件下载后，把它拖进微信里和老师的聊天窗口。</span><br>Ensuite, fais glisser le fichier dans WeChat."}</div>
+          ${envoi ? `<div class="note ${envoi === "partage" ? "ok" : envoi === "telecharge" ? "ok" : envoi === "annule" ? "mid" : "ko"}">${etatEnvoi[envoi]}</div>` : ""}`}
         </div>` : ""}
       <div class="row">
         <button class="btn" id="encore">${ICON.repeat}<span class="zh">再练一次</span><small>Encore</small></button>
@@ -560,6 +574,7 @@ function qRepeter(auto) {
     $("b-l").onclick = () => joue(it, true);
     if ($("b-r")) $("b-r").onclick = () => { envoi = ""; enrBascule(dessine); };
     if ($("b-s")) $("b-s").onclick = async () => { envoi = await enrPartage(it, S.i + 1); dessine(); };
+    if ($("b-lien")) $("b-lien").onclick = e => copierLien(e.currentTarget);
     $("encore").onclick = () => { envoi = ""; enrVide(); dessine(); joue(it, false); };
     $("suite").onclick = () => suivant(true);
   };
@@ -793,6 +808,21 @@ async function dlgJoue(role) {
 // ============================================================
 // DÉMARRAGE — un QR code de PDF arrive avec ?c=c01
 // ============================================================
+// Mise à jour automatique : certains navigateurs (dont celui de WeChat) gardent une vieille copie de la page.
+// version.txt est réécrit à chaque publication ; s'il diffère, on recharge une fois avec une adresse neuve.
+const VERSION_APPLI = "6ae525de7f";
+(function () {
+  if (location.protocol === "file:") return;
+  fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.text() : "").then(v => {
+    v = (v || "").trim();
+    if (!v || v === VERSION_APPLI) return;
+    const cle = "coachfr-maj-" + v;
+    try { if (sessionStorage.getItem(cle)) return; sessionStorage.setItem(cle, "1"); } catch (e) {}
+    const p = new URLSearchParams(location.search); p.set("v", v);
+    location.replace(location.pathname + "?" + p.toString() + location.hash);
+  }).catch(() => {});
+})();
+
 (function () {
   const q = new URLSearchParams(location.search).get("c");
   if (q && coursPar(q) && !location.hash) { history.replaceState(null, "", location.pathname + "#" + q); }
